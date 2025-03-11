@@ -48,7 +48,7 @@ function Layout() {
     <>
       <Header signer={signer} setSigner={setSigner}/>
       <Box as="main" maxW={1024} mx="auto">
-        <CurrentLiquidity liquidityPoolContract={liquidityPoolContract}/>
+        <CurrentLiquidity liquidityPoolContract={liquidityPoolContract} />
         <Outlet context={{ tokenAContract, tokenBContract, liquidityPoolContract, signer }} />
       </Box>
     </>

@@ -7,7 +7,7 @@ import CurrentLiquidity from "@/components/CurrentLiquidity";
 import RemoveLiquidity from "@/components/RemoveLiquidity";
 
 function LiquidityPage() {
-  const { signer, tokenAContract, tokenBContract, liquidityPoolContract } = useOutletContext<OutletContext>();
+  const { signer, tokenAContract, tokenBContract, liquidityPoolContract, onUpdated } = useOutletContext<OutletContext>();
   const [approveAmountA, setApproveAmountA] = useState<string>("0");
   const [approveAmountB, setApproveAmountB] = useState<string>("0");
   const [allowanceA, setAllowanceA] = useState<string>("0");
@@ -140,79 +140,105 @@ function LiquidityPage() {
         allowance_A();
         allowance_B();
         getBalance();
+        onUpdated();
       }
+    };
+
+    const handleLiquidityRemoved = () => {
+      allowance_A();
+      allowance_B();
+      getBalance();
+      onUpdated();
     };
 
   return (
     <Flex direction={"column"} justify={"center"} justifyItems={"center"} gap={4} p={4}>
-      <Grid templateColumns="repeat(2, 1fr)" gap="4" justifyItems={"center"}>
-        <Flex alignItems={"center"} justify={"center"}>
-          <Text>보유</Text>
-          <Image src="/ether.png" w="8" />
-          <Text>{balanceA}</Text>
-        </Flex>
-        <Flex alignItems={"center"} justify={"center"}>
-          <Text>보유</Text>
-          <Image src="/rifty.png" w="8" />
-          <Text>{balanceB}</Text>
-        </Flex>
-          <Input
-            type="number"
-            colorPalette="purple"
-            value={approveAmountA}
-            onChange={(e) => setApproveAmountA(e.target.value)}
-            disabled={isLoading}
-          />
-          <Input
-            type="number"
-            colorPalette="purple"
-            value={approveAmountB}
-            onChange={(e) => setApproveAmountB(e.target.value)}
-            disabled={isLoading}
-          />
-          <Button
-            type="submit"
-            loading={isLoading}
-            colorPalette="purple"
-            disabled={!signer}
-            onClick={() => approveA()}
-          >
-            LP 승인
-          </Button>
-          <Button
-            type="submit"
-            loading={isLoading}
-            colorPalette="purple"
-            disabled={!signer}
-            onClick={() => approveB()}
-          >
-            LP 승인
-          </Button>
-          <Flex alignItems={"center"} justify={"center"}>
-            <Text>승인된</Text>
-            <Image src="/ether.png" w="8" />
-            <Text>{allowanceA}</Text>
+      <Flex direction={"column"} gap="4" justifyItems={"center"}>
+        <Box bgColor={"purple.100"} rounded={"xl"}>
+          <Flex alignItems={"center"} justify={"space-evenly"} m={4}>
+            <Flex direction={"column"} gap="4" justifyItems={"center"}>
+              <Flex alignItems={"center"} justify={"center"}>
+                <Text>보유</Text>
+                <Image src="/ether.png" w="8" />
+                <Text>{Number(balanceA).toFixed()}</Text>
+              </Flex>
+              <Input
+                type="number"
+                colorPalette="purple"
+                textAlign={"center"}
+                value={approveAmountA}
+                onChange={(e) => setApproveAmountA(e.target.value)}
+                disabled={isLoading}
+              />
+              <Flex justifyContent="center">
+                <Button
+                  type="submit"
+                  loading={isLoading}
+                  colorPalette="purple"
+                  disabled={!signer}
+                  onClick={() => approveA()}
+                >
+                  LP 승인
+                </Button>
+              </Flex>
+            </Flex>
+            <Flex direction={"column"} gap="4" justifyItems={"center"}>
+              <Flex alignItems={"center"} justify={"center"}>
+                <Text>보유</Text>
+                <Image src="/rifty.png" w="8" />
+                <Text>{Number(balanceB).toFixed()}</Text>
+              </Flex>
+              <Input
+                type="number"
+                colorPalette="purple"
+                textAlign={"center"}
+                value={approveAmountB}
+                onChange={(e) => setApproveAmountB(e.target.value)}
+                disabled={isLoading}
+              />
+              <Flex justifyContent="center">
+                <Button
+                  type="submit"
+                  loading={isLoading}
+                  colorPalette="purple"
+                  disabled={!signer}
+                  onClick={() => approveB()}
+                >
+                  LP 승인
+                </Button>
+              </Flex>
+            </Flex>
           </Flex>
-          <Flex alignItems={"center"} justify={"center"}>
-            <Text>승인된</Text>
-            <Image src="/rifty.png" w="8" />
-            <Text>{allowanceB}</Text>
+        </Box>
+        <Box bgColor={"purple.100"} rounded={"xl"} p={4}>
+          <Flex direction={"column"} gap={4}>
+            <Flex alignItems={"center"} justify={"space-evenly"}>
+              <Flex alignItems={"center"} justify={"center"}>
+                <Text>승인된</Text>
+                <Image src="/ether.png" w="8" />
+                <Text>{Number(allowanceA).toFixed()}</Text>
+              </Flex>
+              <Flex alignItems={"center"} justify={"center"}>
+                <Text>승인된</Text>
+                <Image src="/rifty.png" w="8" />
+                <Text>{Number(allowanceB).toFixed()}</Text>
+              </Flex>
+            </Flex>
+            <Flex justifyContent="center">
+              <Button
+                type="submit"
+                loading={isLoading && isLoading2}
+                colorPalette="purple"
+                disabled={!signer || (Number(allowanceA) === 0 || Number(allowanceB) === 0)}
+                onClick={() => addLiquidity()}
+              >
+                LP 제공
+              </Button>
+            </Flex>
           </Flex>
-      </Grid>
-      <Box>
-        <Flex gap={4} justify={"center"} mb={4}>          
-          <Button
-            type="submit"
-            loading={isLoading && isLoading2}
-            colorPalette="purple"
-            disabled={!signer || (Number(allowanceA) === 0 || Number(allowanceB) === 0)}
-            onClick={() => addLiquidity()}
-          >
-            LP 제공
-          </Button>
-        </Flex>
-        <RemoveLiquidity signer={signer} liquidityPoolContract={liquidityPoolContract} />
-      </Box>
+        </Box>
+      </Flex>
+      <RemoveLiquidity signer={signer} liquidityPoolContract={liquidityPoolContract} />
     </Flex>
   )
 }

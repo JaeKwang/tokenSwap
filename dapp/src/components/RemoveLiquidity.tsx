@@ -72,7 +72,7 @@ function RemoveLiquidity({signer, liquidityPoolContract} : RemoveLiquidityProps)
     
     return (
         <form onSubmit={removeLiquidity}>
-            <Flex>
+            <Flex gap={4}>
                 <Input 
                     placeholder={`보유 LP 토큰: ${LPTokenBalance}`}
                     value={removeAmount}

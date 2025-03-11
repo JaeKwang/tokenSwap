@@ -49,7 +49,6 @@ function Header({signer, setSigner}: HeaderProps) {
                     </Button>
                 </MenuTrigger>
                 <MenuContent>
-                    <MenuButton name="⛏ Mint Token" href="/mint"/>
                     <MenuButton name="💰 Swap Token" href="/"/>
                     <MenuButton name="🏛️ Liquidity Pool" href="/liquidity"/>
                 </MenuContent>

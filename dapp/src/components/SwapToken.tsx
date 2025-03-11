@@ -11,6 +11,7 @@ interface SwapTokenProps {
 }
 
 export function SwapToken({signer, tokenAContract, tokenBContract, liquidityPoolContract} : SwapTokenProps) {
+    const [isLoading, setIsLoading] = useState(false);
     const [isReverse, setIsReverse] = useState(false);
     const [tokenA, setTokenA] = useState<string>("0");
     const [tokenB, setTokenB] = useState<string>("0");
@@ -46,6 +47,7 @@ export function SwapToken({signer, tokenAContract, tokenBContract, liquidityPool
         }
     
         try {
+            setIsLoading(true);
           if (!isReverse) {
             const tx = await liquidityPoolContract.swapAForB(
               ethers.parseUnits(tokenA, 18),
@@ -67,6 +69,8 @@ export function SwapToken({signer, tokenAContract, tokenBContract, liquidityPool
           }
         } catch (error) {
           console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -195,6 +199,7 @@ export function SwapToken({signer, tokenAContract, tokenBContract, liquidityPool
                     type="submit"
                     disabled={!signer}
                     colorPalette="purple"
+                    loading={isLoading}
                 >
                     토큰 스왑
                 </Button>
