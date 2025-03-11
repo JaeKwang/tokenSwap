@@ -1,13 +1,11 @@
-import { Box, Button, Flex, Grid, Image, Input, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Image, Input, Text } from "@chakra-ui/react";
 import { useOutletContext } from "react-router-dom";
 import { OutletContext } from "@/components/Layout";
 import { FormEvent, useEffect, useState } from "react";
 import { ethers } from "ethers";
-import CurrentLiquidity from "@/components/CurrentLiquidity";
-import RemoveLiquidity from "@/components/RemoveLiquidity";
 
 function MintPage() {
-    const { signer, tokenAContract, tokenBContract, liquidityPoolContract } = useOutletContext<OutletContext>();
+    const { signer, tokenAContract, tokenBContract } = useOutletContext<OutletContext>();
 
     const [balanceA, setBalanceA] = useState<string>("0");
     const [balanceB, setBalanceB] = useState<string>("0");

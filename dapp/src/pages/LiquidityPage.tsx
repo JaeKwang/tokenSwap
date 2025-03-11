@@ -1,13 +1,12 @@
-import { Box, Button, Flex, Grid, Image, Input, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Image, Input, Text } from "@chakra-ui/react";
 import { useOutletContext } from "react-router-dom";
 import { OutletContext } from "@/components/Layout";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import CurrentLiquidity from "@/components/CurrentLiquidity";
 import RemoveLiquidity from "@/components/RemoveLiquidity";
 
 function LiquidityPage() {
-  const { signer, tokenAContract, tokenBContract, liquidityPoolContract, onUpdated } = useOutletContext<OutletContext>();
+  const { signer, tokenAContract, tokenBContract, liquidityPoolContract } = useOutletContext<OutletContext>();
   const [approveAmountA, setApproveAmountA] = useState<string>("0");
   const [approveAmountB, setApproveAmountB] = useState<string>("0");
   const [allowanceA, setAllowanceA] = useState<string>("0");
@@ -140,15 +139,7 @@ function LiquidityPage() {
         allowance_A();
         allowance_B();
         getBalance();
-        onUpdated();
       }
-    };
-
-    const handleLiquidityRemoved = () => {
-      allowance_A();
-      allowance_B();
-      getBalance();
-      onUpdated();
     };
 
   return (

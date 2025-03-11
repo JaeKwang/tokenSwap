@@ -9,7 +9,7 @@ import CurrentLiquidity from "./CurrentLiquidity";
 
 export interface OutletContext {
   tokenAContract: Contract | null;
-  tokenABontract: Contract | null;
+  tokenBContract: Contract | null;
   liquidityPoolContract: Contract | null;
   signer: JsonRpcSigner | null;
 }
@@ -48,7 +48,7 @@ function Layout() {
     <>
       <Header signer={signer} setSigner={setSigner}/>
       <Box as="main" maxW={1024} mx="auto">
-        <CurrentLiquidity liquidityPoolContract={liquidityPoolContract} />
+        <CurrentLiquidity />
         <Outlet context={{ tokenAContract, tokenBContract, liquidityPoolContract, signer }} />
       </Box>
     </>

@@ -1,7 +1,6 @@
-import CurrentLiquidity from "@/components/CurrentLiquidity";
 import { OutletContext } from "@/components/Layout";
 import { SwapToken } from "@/components/SwapToken";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useOutletContext } from "react-router-dom";
 
 function SwapPage() {

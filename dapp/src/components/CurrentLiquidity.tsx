@@ -1,14 +1,9 @@
 import { Table } from "@chakra-ui/react";
-import { Contract, ethers } from "ethers";
-import { JsonRpcSigner } from "ethers";
+import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import LiquidityPoolABI from "../abis/LiquidityPool.json";
 
-interface CurrentLiquidityProps {
-  liquidityPoolContract: Contract | null;
-}
-
-function CurrentLiquidity({ liquidityPoolContract }: CurrentLiquidityProps) {
+function CurrentLiquidity() {
   const [totalLiquidity, setTotalLiquidity] = useState("0");
   const [reserveA, setReserveA] = useState("0");
   const [reserveB, setReserveB] = useState("0");
