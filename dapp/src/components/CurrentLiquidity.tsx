@@ -2,6 +2,7 @@ import { Table } from "@chakra-ui/react";
 import { Contract, ethers } from "ethers";
 import { JsonRpcSigner } from "ethers";
 import { useEffect, useState } from "react";
+import LiquidityPoolABI from "../abis/LiquidityPool.json";
 
 interface CurrentLiquidityProps {
   liquidityPoolContract: Contract | null;
@@ -12,35 +13,28 @@ function CurrentLiquidity({ liquidityPoolContract }: CurrentLiquidityProps) {
   const [reserveA, setReserveA] = useState("0");
   const [reserveB, setReserveB] = useState("0");
 
-  const getTotalLiquidity = async () => {
-    if (!liquidityPoolContract) return;
-
+  const fetchData = async () => {
     try {
-      const res = await liquidityPoolContract.totalSupply();
-
-      setTotalLiquidity(ethers.formatEther(res));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getReserves = async () => {
-    if (!liquidityPoolContract) return;
-
-    try {
-      const res1 = await liquidityPoolContract.reserveA();
-      const res2 = await liquidityPoolContract.reserveB();
+      const provider = new ethers.JsonRpcProvider("https://ethereum-sepolia.publicnode.com");
+      const contract = new ethers.Contract(
+        import.meta.env.VITE_LIQUIDITY_POOL_ADDRESS, 
+        LiquidityPoolABI, 
+        provider
+      );
+      const res1 = await contract.reserveA();
+      const res2 = await contract.reserveB();
+      const res3 = await contract.totalSupply();
       setReserveA(ethers.formatEther(res1));
       setReserveB(ethers.formatEther(res2));
+      setTotalLiquidity(ethers.formatEther(res3));
     } catch (error) {
-      console.error(error);
+      console.error("Error reading contract:", error);
     }
   };
-
+  
   useEffect(() => {
-    getTotalLiquidity();
-    getReserves();
-  }, [liquidityPoolContract]);
+    fetchData();
+  }, []);
 
   return (
     <Table.Root>

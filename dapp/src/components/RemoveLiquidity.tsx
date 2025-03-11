@@ -1,19 +1,20 @@
-import { Button, Flex, Input, Text } from "@chakra-ui/react";
+import { Button, Flex, Input } from "@chakra-ui/react";
 import { Contract, ethers } from "ethers";
 import { JsonRpcSigner } from "ethers";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 interface RemoveLiquidityProps {
     signer: JsonRpcSigner | null;
     liquidityPoolContract: Contract | null;
-  }
+}
 
 function RemoveLiquidity({signer, liquidityPoolContract} : RemoveLiquidityProps) {
 
     const [LPTokenBalance, setLPTokenBalance] = useState<string>('0');
     const [removeAmount, setRemoveAmount] = useState<string>('');
     const [isValid, setIsValid] = useState<boolean>(false);
-
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    
     useEffect(() => {
         const getLPToken = async () => {
             if (!liquidityPoolContract) return;
@@ -47,10 +48,28 @@ function RemoveLiquidity({signer, liquidityPoolContract} : RemoveLiquidityProps)
         } else setIsValid(false);
         
     }, [removeAmount])
-    const removeLiquidity = async () => {
 
-    }
+    const removeLiquidity = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
+        if (!signer || !liquidityPoolContract || isNaN(Number(removeAmount))) {
+          return;
+        }
+    
+        try {
+          setIsLoading(true);    
+          const tx = await liquidityPoolContract.removeLiquidity(
+            ethers.parseUnits(removeAmount, 18)
+          );
+          await tx.wait();
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoading(false);
+          setRemoveAmount('');
+        }
+    };
+    
     return (
         <form onSubmit={removeLiquidity}>
             <Flex>
@@ -59,7 +78,12 @@ function RemoveLiquidity({signer, liquidityPoolContract} : RemoveLiquidityProps)
                     value={removeAmount}
                     onChange={(e) => setRemoveAmount(e.target.value)}
                 />
-                <Button disabled={!isValid} colorPalette='purple'>
+                <Button
+                    type="submit"
+                    disabled={!isValid}
+                    colorPalette='purple'
+                    loading={isLoading}
+                >
                     LP 환수
                 </Button>
             </Flex>

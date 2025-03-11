@@ -7,6 +7,7 @@ import MetamaskButton from "./MetamaskButton";
 import { Dispatch, SetStateAction } from "react";
 import { JsonRpcSigner } from "ethers";
 import { Toaster, toaster } from "@/components/ui/toaster"
+import { MdContentCopy } from "react-icons/md";
 
 interface HeaderProps {
     signer: JsonRpcSigner | null;
@@ -48,12 +49,13 @@ function Header({signer, setSigner}: HeaderProps) {
                     </Button>
                 </MenuTrigger>
                 <MenuContent>
+                    <MenuButton name="⛏ Mint Token" href="/mint"/>
                     <MenuButton name="💰 Swap Token" href="/"/>
                     <MenuButton name="🏛️ Liquidity Pool" href="/liquidity"/>
                 </MenuContent>
             </MenuRoot>
             <Box fontSize="2xl" fontWeight="semibold" color="gray.600">
-              JK Swap
+              My Token Swap
             </Box>
             <Flex>
                 {signer ? 
@@ -73,9 +75,14 @@ function Header({signer, setSigner}: HeaderProps) {
                             }}
                             onClick={() => handleCopyClipBoard(signer.address)}
                         >
-                            🦊 {signer.address.substring(0, 7)}
-                            ...
-                            {signer.address.substring(signer.address.length - 5)}
+                            <Flex alignItems={"center"}>
+                                <Box>
+                                    🦊 {signer.address.substring(0, 7)}
+                                    ...
+                                    {signer.address.substring(signer.address.length - 5)}
+                                </Box>
+                                <MdContentCopy />
+                            </Flex>
                         </MenuItem>
                     </MenuContent>
                 </MenuRoot>

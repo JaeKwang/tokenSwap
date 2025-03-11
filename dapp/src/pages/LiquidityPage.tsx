@@ -24,7 +24,8 @@ function LiquidityPage() {
       setBalanceA("0");
       setBalanceB("0");
     }
-    allowance();
+    allowance_A();
+    allowance_B();
     getBalance();
   }, [signer, tokenAContract, tokenBContract])
   
@@ -45,50 +46,70 @@ function LiquidityPage() {
     }
   };
 
-  const allowance = async () => {
-    if (!signer || !tokenAContract || !tokenBContract) return;
+  const allowance_A = async () => {
+    if (!signer || !tokenAContract ) return;
     try {
-      const res1 = await tokenAContract.allowance(
+      const res = await tokenAContract.allowance(
         signer.address,
         import.meta.env.VITE_LIQUIDITY_POOL_ADDRESS
       );
-      setAllowanceA(ethers.formatEther(res1));
-
-      const res2 = await tokenBContract.allowance(
-        signer.address,
-        import.meta.env.VITE_LIQUIDITY_POOL_ADDRESS
-      );
-      setAllowanceB(ethers.formatEther(res2));
+      setAllowanceA(ethers.formatEther(res));
     } catch (error) {
       console.error(error);
     }
   };
 
-  const approve = async () => {
-      if(isNaN(Number(approveAmountA))) return;
-      if(isNaN(Number(approveAmountB))) return;
-      
-      try {
-        setIsLoading(true)
-        const tx1 = await tokenAContract?.approve(
-          import.meta.env.VITE_LIQUIDITY_POOL_ADDRESS,
-          ethers.parseUnits(approveAmountA, 18)
-        );
-        const tx2 = await tokenBContract?.approve(
-          import.meta.env.VITE_LIQUIDITY_POOL_ADDRESS,
-          ethers.parseUnits(approveAmountB, 18)
-        );
-
-        await tx2.wait();
-        await tx1.wait();
-
-        allowance();
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setIsLoading(false)
-      }
+  const allowance_B = async () => {
+    if (!signer || !tokenBContract ) return;
+    try {
+      const res = await tokenBContract.allowance(
+        signer.address,
+        import.meta.env.VITE_LIQUIDITY_POOL_ADDRESS
+      );
+      setAllowanceB(ethers.formatEther(res));
+    } catch (error) {
+      console.error(error);
     }
+  };
+
+
+  const approveA = async () => {
+    if(isNaN(Number(approveAmountA)) || Number(approveAmountA) === 0) return;
+    
+    try {
+      setIsLoading(true)
+      const tx = await tokenAContract?.approve(
+        import.meta.env.VITE_LIQUIDITY_POOL_ADDRESS,
+        ethers.parseUnits(approveAmountA, 18)
+      );
+      await tx.wait();
+      allowance_A();
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setIsLoading(false);
+      setApproveAmountA('0');
+    }
+  }
+
+  const approveB = async () => {
+    if(isNaN(Number(approveAmountB)) || Number(approveAmountB) === 0) return;
+    
+    try {
+      setIsLoading(true)
+      const tx = await tokenBContract?.approve(
+        import.meta.env.VITE_LIQUIDITY_POOL_ADDRESS,
+        ethers.parseUnits(approveAmountB, 18)
+      );
+      await tx.wait();
+      allowance_B();
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setIsLoading(false);
+      setApproveAmountB('0');
+    }
+  }
 
   const addLiquidity = async () => {  
       if (
@@ -110,17 +131,20 @@ function LiquidityPage() {
         );
   
         await tx.wait();
-        allowance();
       } catch (error) {
         console.error(error);
       } finally {
         setIsLoading(false);
         setIsLoading2(false);
+
+        allowance_A();
+        allowance_B();
+        getBalance();
       }
     };
 
   return (
-    <Flex direction={"column"} justify={"center"} justifyItems={"center"} gap={20} p={4}>
+    <Flex direction={"column"} justify={"center"} justifyItems={"center"} gap={4} p={4}>
       <Grid templateColumns="repeat(2, 1fr)" gap="4" justifyItems={"center"}>
         <Flex alignItems={"center"} justify={"center"}>
           <Text>보유</Text>
@@ -146,6 +170,24 @@ function LiquidityPage() {
             onChange={(e) => setApproveAmountB(e.target.value)}
             disabled={isLoading}
           />
+          <Button
+            type="submit"
+            loading={isLoading}
+            colorPalette="purple"
+            disabled={!signer}
+            onClick={() => approveA()}
+          >
+            LP 승인
+          </Button>
+          <Button
+            type="submit"
+            loading={isLoading}
+            colorPalette="purple"
+            disabled={!signer}
+            onClick={() => approveB()}
+          >
+            LP 승인
+          </Button>
           <Flex alignItems={"center"} justify={"center"}>
             <Text>승인된</Text>
             <Image src="/ether.png" w="8" />
@@ -157,18 +199,8 @@ function LiquidityPage() {
             <Text>{allowanceB}</Text>
           </Flex>
       </Grid>
-      <Box >
-        <Flex gap={4} justify={"center"}>
-          <Button
-            type="submit"
-            loading={isLoading}
-            loadingText="로딩중"
-            colorPalette="purple"
-            disabled={!signer}
-            onClick={() => approve()}
-          >
-            LP 승인
-          </Button>
+      <Box>
+        <Flex gap={4} justify={"center"} mb={4}>          
           <Button
             type="submit"
             loading={isLoading && isLoading2}
@@ -179,7 +211,7 @@ function LiquidityPage() {
             LP 제공
           </Button>
         </Flex>
-        <RemoveLiquidity signer={signer} liquidityPoolContract={liquidityPoolContract}/>
+        <RemoveLiquidity signer={signer} liquidityPoolContract={liquidityPoolContract} />
       </Box>
     </Flex>
   )
